@@ -3,21 +3,35 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
 import Navbar from "@/components/layout/Navbar";
 import Dashboard from "@/pages/Dashboard";
 import PanelControl from "@/pages/PanelControl";
-import Categorias from "@/pages/Categorias";
-import Productos from "@/pages/Productos";
+import Categorias from "@/pages/categorias/Categorias";
+import Productos from "@/pages/productos/Productos";
 import Caja from "@/pages/Caja";
 import Proveedores from "@/pages/Proveedores";
 import Venta from "@/pages/Venta";
 import Settings from "@/pages/modal_profile/Settings";
 import Profile from "@/pages/modal_profile/Profile";
 import NotFound from "@/pages/NotFound";
-
+import Login from "@/pages/login/login";
+import CrearProducto from "@/pages/productos/CrearProducto";
+import EditarProductoPage from "@/pages/productos/EditarProducto";
 const queryClient = new QueryClient();
+
+// Componente para proteger rutas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const isAuthenticated = !!localStorage.getItem('token');
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -40,76 +54,121 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Ruta pública */}
+          <Route path="/login" element={<Login />} />
+          
+          {/* Rutas protegidas */}
           <Route
             path="/"
             element={
-              <Layout>
-                <Dashboard />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/panel-control"
             element={
-              <Layout>
-                <PanelControl />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <PanelControl />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/categorias"
             element={
-              <Layout>
-                <Categorias />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Categorias />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/productos"
             element={
-              <Layout>
-                <Productos />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Productos />
+                </Layout>
+              </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/productos/crear"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CrearProducto />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/productos/editar/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <EditarProductoPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/caja"
             element={
-              <Layout>
-                <Caja />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Caja />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/proveedores"
             element={
-              <Layout>
-                <Proveedores />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Proveedores />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/venta"
             element={
-              <Layout>
-                <Venta />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Venta />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <Layout>
-                <Settings />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Settings />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/profile"
             element={
-              <Layout>
-                <Profile />
-              </Layout>
+              <ProtectedRoute>
+                <Layout>
+                  <Profile />
+                </Layout>
+              </ProtectedRoute>
             }
           />
           <Route path="/404" element={<NotFound />} />
